@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import axios from 'axios';
 import './App.css';
 
 function App() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
+  const answerContainerRef = useRef(null); // Create a reference for the answer container
 
   async function generateAnswer() {
     setAnswer("Loading...");
@@ -14,6 +15,10 @@ function App() {
         { contents: [{ parts: [{ text: question }] }] }
       );
       setAnswer(response.data.candidates[0].content.parts[0].text);
+      // Scroll to the answer container after setting the answer
+      if (answerContainerRef.current) {
+        answerContainerRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
       setAnswer('Error fetching answer');
@@ -30,9 +35,11 @@ function App() {
         cols="30"
         rows="10"
       />
-      <button onClick={generateAnswer}>Generate Answer</button>
-      <div className="answer-container">
-        <h1 className="animate-header">ASKGPT</h1>
+      <div className="button-container">
+        <button onClick={generateAnswer}>Generate Answer</button>
+      </div>
+      <div className="answer-container" ref={answerContainerRef}>
+        <h1 className="animate-header">Answer</h1>
         <div className="answer-content">
           <pre>{answer}</pre>
         </div>
